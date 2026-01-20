@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-CounterController controller = CounterController();
-
 void main() {
   runApp(const CounterApp());
 }
@@ -12,18 +10,17 @@ class CounterApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: HomeScreen());
+    return GetMaterialApp(
+      initialBinding: ControllerBinder(),
+      home: HomeScreen(),
+    );
   }
 }
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
 
-class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -37,9 +34,8 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Center(
-              child: GetBuilder(
-                init: controller,
-                builder: (context) {
+              child: GetBuilder<CounterController>(
+                builder: (controller) {
                   return Text(
                     '${controller.count}',
                     style: TextStyle(fontSize: 39, fontWeight: FontWeight.bold),
@@ -69,14 +65,14 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             FloatingActionButton(
               onPressed: () {
-                controller.increment();
+                Get.find<CounterController>().increment();
               },
               child: Icon(Icons.add),
             ),
             SizedBox(width: 10),
             FloatingActionButton(
               onPressed: () {
-                controller.decrement();
+                Get.find<CounterController>().decrement();
               },
               child: Icon(Icons.remove),
             ),
@@ -87,37 +83,34 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
-  @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
 
-class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('profile')),
-      body: Center(child: GetBuilder(
-        init: controller,
-        builder: (context) {
-          return Text("${controller.count}");
-        }
-      )),
+      body: Center(
+        child: GetBuilder<CounterController>(
+          builder: (ctx) {
+            return Text("${ctx.count}");
+          },
+        ),
+      ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           FloatingActionButton(
             onPressed: () {
-              controller.increment();
+              Get.find<CounterController>().increment();
             },
             child: Icon(Icons.add),
           ),
           const SizedBox(width: 12),
           FloatingActionButton(
             onPressed: () {
-              controller.decrement();
+              Get.find<CounterController>().decrement();
             },
             child: Icon(Icons.remove),
           ),
@@ -137,5 +130,12 @@ class CounterController extends GetxController {
   void decrement() {
     count--;
     update();
+  }
+}
+
+class ControllerBinder extends Bindings {
+  @override
+  void dependencies() {
+    Get.put(CounterController());
   }
 }
